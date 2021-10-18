@@ -1,5 +1,8 @@
+# TODO: try best practices, add batchnorm? LeakyReLU? Dropout?
 import numpy as np
 from numpy.random import default_rng
+import matplotlib.pyplot as plt 
+from scipy.stats import norm
 import torch
 import torch.nn as nn
 import torch.nn.parallel
@@ -10,7 +13,7 @@ ngpu = 1
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
-nz = 2
+nz = 6
 
 nc = 2
 
@@ -19,15 +22,24 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            nn.Linear(nz, 16),
+            nn.Linear(nz, 32),
             nn.ReLU(True),
 
-            nn.Linear(16, 16),
+            nn.Linear(32, 64),
+            nn.Dropout(p=0.2),
+            nn.ReLU(True),
+
+            nn.Linear(64, 32),
+            nn.Dropout(p=0.2),
+            nn.ReLU(True),
+
+            nn.Linear(32, 16),
+            nn.Dropout(p=0.2),
             nn.ReLU(True),
 
             nn.Linear(16, 1),
-            nn.ReLU(True)
-
+            nn.ReLU(True)        
+            
         )
 
     def forward(self, x):
@@ -39,10 +51,10 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            nn.Linear(nc, 16),
+            nn.Linear(nc, 32),
             nn.ReLU(True),
 
-            nn.Linear(16, 32),
+            nn.Linear(32, 32),
             nn.ReLU(True),
 
             nn.Linear(32, 16),
@@ -57,17 +69,29 @@ class Discriminator(nn.Module):
         return self.main(x)
 
 
+def weights_init(m):
+    # optionally, initialize models weights
+    classname = m.__class__.__name__
+    if classname.find('Linear') != -1:
+        nn.init.kaiming_uniform_(m.weight.data)
+
+
 if __name__ == '__main__':
 
     print(device, '\n')
     rng = default_rng()
-    # load and batch training data: 1000 batches of size 1000
-    dataset = np.split(np.load('order0/dataset.npy'), 1000)
+    # load and batch training data
+    dataset = np.split(np.load('order0/dataset.npy'), 10000)
+    # test = dataset[0][:, 1]
+    # plt.hist(test, bins=25, density=True, alpha=0.6)
+    # plt.show()
 
     netG = Generator(ngpu).to(device)
+    netG.apply(weights_init)
     print(netG, '\n')
 
     netD = Discriminator(ngpu).to(device)
+    netD.apply(weights_init)
     print(netD, '\n')
 
     # Initialize BCELoss function
@@ -77,11 +101,11 @@ if __name__ == '__main__':
     real_label = 1.
     fake_label = 0.
 
-    # Setup Adam optimizers for both G and D
+    # Setup Adam optimizers for both G and D, optionally set lower lr, eg lr = 0.0005
     optimizerD = optim.Adam(netD.parameters())
     optimizerG = optim.Adam(netG.parameters())
 
-    num_epochs = 3
+    num_epochs = 5
     G_losses = []
     D_losses = []
     iters = 0
@@ -109,11 +133,11 @@ if __name__ == '__main__':
             D_x = output.mean().item()
 
             ## Train with all-fake batch
-            # Generate batch of latent vectors(from uniform)
-            noise = rng.random(b_size,)
+            # Generate batch of latent vectors (from uniform)
+            noise = rng.random((b_size, 5))
             noise = np.column_stack((data[:, 0], noise))
             noise = torch.tensor(noise, dtype=torch.float, device=device)
-            # Generate fake image batch with G
+            # Generate fake batch with G
             fake = netG(noise)
             label.fill_(fake_label)
             # Classify all fake batch with Dc
@@ -145,7 +169,7 @@ if __name__ == '__main__':
             optimizerG.step()
 
             # Output training stats
-            if i % 100 == 0:
+            if i % 1000 == 0:
                 print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                     % (epoch, num_epochs, i, len(dataset),
                          errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
@@ -156,12 +180,19 @@ if __name__ == '__main__':
 
             iters += 1
 
-
-    test_number = torch.full((10000, ), 10., dtype=torch.float, device=device)
-    test_noise = torch.rand(10000, dtype=torch.float32, device=device)
+    # testing the perofrmance of the generator on new inputs
+    test_number = torch.full((100000, ), 10., dtype=torch.float, device=device)
+    test_noise = torch.rand((100000, 5), dtype=torch.float32, device=device)
     input_test = torch.column_stack((test_number, test_noise))
 
-    test_output = netG(input_test).to('cpu')
-    print(test_output)
-
-
+    test_output = netG(input_test).cpu().detach().numpy()
+    # print(test_output)
+    
+    plt.hist(test_output, bins=100, density=True, alpha=0.6, color='b')
+    # Plot the expected PDF against the generator outputs
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 1000)
+    p = norm.pdf(x, 10, 1)
+  
+    plt.plot(x, p, 'k', linewidth=2)
+    plt.show()
