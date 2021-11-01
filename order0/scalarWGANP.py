@@ -1,5 +1,4 @@
-# TODO: understand models outputs
-from types import new_class
+
 import numpy as np
 from numpy.random import default_rng
 import matplotlib.pyplot as plt 
@@ -9,7 +8,6 @@ import torch.nn as nn
 import torch.nn.parallel
 import torch.optim as optim
 from tqdm import tqdm
-import ot
 
 ngpu = 1
 
@@ -113,17 +111,17 @@ if __name__ == '__main__':
     rng = default_rng(43)
     # load and batch training data
     # dataset = np.load('order0/dataset.npy')[999:1998, 1]
-    dataset = rng.standard_normal(1000, dtype=np.float32)
+    dataset = np.array(rng.normal(10, 1, 1000), dtype=np.float32)
     
     plt.hist(dataset, bins=50, density=True, alpha=0.6)
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 1000)
-    p = norm.pdf(x, 0, 1)
+    p = norm.pdf(x, 10, 1)
     plt.plot(x, p, 'k', linewidth=2)
     plt.show()
     
     # Create the dataloader
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=198,
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=100,
                                          shuffle=True, num_workers=2)
 
     netG = Generator(ngpu).to(device)
@@ -138,7 +136,7 @@ if __name__ == '__main__':
     optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=[0.5, 0.9])
     optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=[0.5, 0.9])
 
-    num_epochs = 1000
+    num_epochs = 25000
     G_losses = []
     D_losses = []
     iters = 0
@@ -225,8 +223,9 @@ if __name__ == '__main__':
 
             iters += 1
 
-    plt.plot(G_losses)
-    plt.plot(D_losses)
+    plt.plot(G_losses, label='G')
+    plt.plot(D_losses, label= 'D')
+    plt.legend()
     plt.show()
 
     # testing the perofrmance of the generator on new inputs
@@ -234,21 +233,19 @@ if __name__ == '__main__':
     test_noise = torch.randn((10000, nz), dtype=torch.float32, device=device)
     # input_test = torch.column_stack((test_number, test_noise))
 
+    # test statistics
     test_output = netG(test_noise).cpu().detach().numpy().flatten()
-    test_truth = rng.standard_normal(10000, dtype=np.float32)
+    test_truth = np.array(rng.normal(10, 1, 10000), dtype=np.float32)
     k2, p = normaltest(test_output)
-    lambd = 1e-3
-    M = ot.dist(test_output.reshape((10000, 1)), test_truth.reshape((10000, 1)))
-    M /= M.max()
-    Gs = wasserstein_distance(test_output, test_truth)
-    # ot.bregman.sinkhorn2(test_output, test_truth, M, lambd, verbose=True)
-    print('\n', 'p-value for normality =', p, '\n', 'EMD= ', Gs)
+    EMD = wasserstein_distance(test_output, test_truth)
+    print('\n', 'p-value for normality =', p, '\n', 'EMD = ', EMD)
     
     plt.hist(test_output, bins=100, density=True, alpha=0.6, color='b')
+    # plt.hist(test_truth, bins=100, density=True, alpha=0.4, color='r')
     # Plot the expected PDF against the generator outputs
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 1000)
-    p = norm.pdf(x, 0, 1)
+    p = norm.pdf(x, 10, 1)
   
     plt.plot(x, p, 'k', linewidth=2)
     plt.show()
