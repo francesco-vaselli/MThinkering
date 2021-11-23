@@ -1,4 +1,5 @@
 # TODO: try best practices, add batchnorm? LeakyReLU? Dropout?
+# TODO: add metric
 import numpy as np
 from numpy.random import default_rng
 import matplotlib.pyplot as plt 
