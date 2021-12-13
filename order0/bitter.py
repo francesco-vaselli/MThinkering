@@ -12,7 +12,7 @@ def bitter(data, bin_exp):
     the array gets split into two equal widths bins and we assing 0 to values to the left and 1 to values to the right.
     at each subsequent iteration each bin is split into two other equal widths bins and the same assignment is performed for each value
 
-    if calling just once, bare numpy is faster. for multiple calls, numba provides 2x speedup
+    if calling just once, bare numpy is faster. for multiple calls numba provides 2x speedup; however np.histogram has to be used instead
 
     Args:
         data ([ 1d np.array]): input dataset
@@ -21,12 +21,14 @@ def bitter(data, bin_exp):
     Returns:
         [(len(data), bin_exp) np.array]: bitted array in the same ordering as data
     """    
-    _, bin_edges = np.histogram(data, bins=2)
+    # _, 
+    bin_edges = np.histogram_bin_edges(data, bins=2)
     inds = np.digitize(data, bin_edges)
     bits = np.where(inds%2 == 1, 0, 1).reshape(-1, 1)
 
     for j in range(2, bin_exp+1):
-        _, bin_edges = np.histogram(data, bins=2**j)
+        # _, 
+        bin_edges = np.histogram_bin_edges(data, bins=2**j)
         # print(bin_edges)
         inds = np.digitize(data, bin_edges)
         next_bit = np.where(inds%2 == 1, 0, 1).reshape(-1, 1)
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     print((full.max()+full.min())/2, median(full))
     # plt.hist(full, bins=100)
     # plt.show()
-    t = timeit.Timer(lambda: bitter(full, 7)) 
+    t = timeit.Timer(lambda: bitter(full, 10)) 
     print (t.timeit(1))
 
     bitted = bitter(full, 3)
