@@ -1,3 +1,4 @@
+from typing import BinaryIO
 import numpy as np
 from statistics import median
 from numpy.random import default_rng
@@ -34,8 +35,34 @@ def bitter(data, bin_exp):
         next_bit = np.where(inds%2 == 1, 0, 1).reshape(-1, 1)
         bits = np.hstack((bits, next_bit))
 
-    return bits
+    return bin_edges, bits
+
+
+def debitter(bits, bin_edges):
+
+    bins = []
+    for _, bit in enumerate(bits):
+        if bit[0] == 1:
+            bin = 2
+        else:
+            bin = 1
+
+        for j in range(1, len(bit)):
+            if bit[j] == 1:
+                bin += bin
+            else:
+                bin += (bin -1)
         
+        bins.append(bin)
+    
+    bins = np.array(bins)
+    hist_min = bin_edges.min()
+    print(hist_min)
+    bin_width = np.ediff1d(bin_edges)[0]
+    hist_centre = lambda t: hist_min + bin_width*(t-0.5)
+    histed = np.vectorize(hist_centre)(bins)
+    
+    return histed
 
 
 if __name__ == '__main__':
@@ -47,11 +74,16 @@ if __name__ == '__main__':
 
     dataset_g = rng.normal(10, 1, int(BUFFER_SIZE/2))
     full = np.array(dataset_g, dtype=np.float32)
-    print((full.max()+full.min())/2, median(full))
-    # plt.hist(full, bins=100)
-    # plt.show()
-    t = timeit.Timer(lambda: bitter(full, 10)) 
-    print (t.timeit(1))
+    
+    plt.hist(full, bins=2**7)
 
-    bitted = bitter(full, 3)
+    # t = timeit.Timer(lambda: bitter(full, 10)) 
+    # print (t.timeit(1))
+
+    bin_edges, bitted = bitter(full, 7)
     print(full[10], bitted[10])
+    histed = debitter(bitted, bin_edges)
+    f = plt.figure()
+    plt.hist(histed, bins=bin_edges)
+
+    plt.show()   
