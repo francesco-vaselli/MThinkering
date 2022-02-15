@@ -1,0 +1,98 @@
+\begin{thebibliography}{10}
+
+\bibitem{tensorflow2015-whitepaper}
+Mart\'{i}n Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen,
+  Craig Citro, Greg~S. Corrado, Andy Davis, Jeffrey Dean, Matthieu Devin,
+  Sanjay Ghemawat, Ian Goodfellow, Andrew Harp, Geoffrey Irving, Michael Isard,
+  Yangqing Jia, Rafal Jozefowicz, Lukasz Kaiser, Manjunath Kudlur, Josh
+  Levenberg, Dandelion Man\'{e}, Rajat Monga, Sherry Moore, Derek Murray, Chris
+  Olah, Mike Schuster, Jonathon Shlens, Benoit Steiner, Ilya Sutskever, Kunal
+  Talwar, Paul Tucker, Vincent Vanhoucke, Vijay Vasudevan, Fernanda Vi\'{e}gas,
+  Oriol Vinyals, Pete Warden, Martin Wattenberg, Martin Wicke, Yuan Yu, and
+  Xiaoqiang Zheng.
+\newblock {TensorFlow}: Large-scale machine learning on heterogeneous systems,
+  2015.
+\newblock Software available from tensorflow.org.
+
+\bibitem{arjovsky2017wasserstein}
+Martin Arjovsky, Soumith Chintala, and Léon Bottou.
+\newblock Wasserstein gan, 2017.
+
+\bibitem{2019glhc}
+Anja Butter, Tilman Plehn, and Ramon Winterhalder.
+\newblock How to gan lhc events.
+\newblock {\em SciPost Physics}, 7(6), Dec 2019.
+
+\bibitem{chang2021quantum}
+Su~Yeon Chang, Sofia Vallecorsa, Elías~F. Combarro, and Federico Carminati.
+\newblock Quantum generative adversarial networks in a continuous-variable
+  architecture to simulate high energy physics detectors, 2021.
+
+\bibitem{durkan}
+Conor Durkan, Artur Bekasov, Iain Murray, and George Papamakarios.
+\newblock Neural spline flows, 2019.
+
+\bibitem{AGOSTINELLI2003250}
+S.~Agostinelli et~al.
+\newblock Geant4—a simulation toolkit.
+\newblock {\em Nuclear Instruments and Methods in Physics Research Section A:
+  Accelerators, Spectrometers, Detectors and Associated Equipment},
+  506(3):250--303, 2003.
+
+\bibitem{goodfellow2014generative}
+Ian~J. Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David
+  Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
+\newblock Generative adversarial networks, 2014.
+
+\bibitem{green2020complete}
+Stephen~R. Green and Jonathan Gair.
+\newblock Complete parameter inference for gw150914 using deep learning, 2020.
+
+\bibitem{523096}
+Felix Jimenez, Amanda Koepke, Mary Gregg, and Michael Frey.
+\newblock Generative adversarial network performance in low-dimensional
+  settings, 2021-04-20 04:04:00 2021.
+
+\bibitem{kingma2014autoencoding}
+Diederik~P Kingma and Max Welling.
+\newblock Auto-encoding variational bayes, 2014.
+
+\bibitem{metz2017unrolled}
+Luke Metz, Ben Poole, David Pfau, and Jascha Sohl-Dickstein.
+\newblock Unrolled generative adversarial networks, 2017.
+
+\bibitem{otten2021event}
+Sydney Otten, Sascha Caron, Wieske de~Swart, Melissa van Beekveld, Luc
+  Hendriks, Caspar van Leeuwen, Damian Podareanu, Roberto~Ruiz de~Austri, and
+  Rob Verheyen.
+\newblock Event generation and statistical sampling for physics with deep
+  generative models and a density information buffer, 2021.
+
+\bibitem{NEURIPS2019_9015}
+Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory
+  Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, Alban
+  Desmaison, Andreas Kopf, Edward Yang, Zachary DeVito, Martin Raison, Alykhan
+  Tejani, Sasank Chilamkurthy, Benoit Steiner, Lu~Fang, Junjie Bai, and Soumith
+  Chintala.
+\newblock Pytorch: An imperative style, high-performance deep learning library.
+\newblock In {\em Advances in Neural Information Processing Systems 32}, pages
+  8024--8035. Curran Associates, Inc., 2019.
+
+\bibitem{rezende2016variational}
+Danilo~Jimenez Rezende and Shakir Mohamed.
+\newblock Variational inference with normalizing flows, 2016.
+
+\bibitem{2019EPJWC.21406021R}
+Andrea {Rizzi}, Giovanni {Petrucciani}, and Marco {Peruzzi}.
+\newblock {A further reduction in CMS event data for analysis: the NANOAOD
+  format}.
+\newblock In {\em European Physical Journal Web of Conferences}, volume 214 of
+  {\em European Physical Journal Web of Conferences}, page 06021, July 2019.
+
+\bibitem{Rosenblatt1958ThePA}
+Frank Rosenblatt.
+\newblock The perceptron: a probabilistic model for information storage and
+  organization in the brain.
+\newblock {\em Psychological review}, 65 6:386--408, 1958.
+
+\end{thebibliography}

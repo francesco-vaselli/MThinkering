@@ -1,0 +1,103 @@
+\documentclass{scrartcl} % KOMA-Script article scrartcl
+\usepackage[utf8]{inputenc}
+\usepackage{appendix}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{url}
+\usepackage{caption}
+\usepackage{subfig}
+\newread\tmp
+
+\newcommand{\quickcharcount}[1]{%
+	\immediate\write18{texcount -1 -sum -merge -char #1.tex > #1-chars.sum}%
+	\openin\tmp=#1-chars.sum%
+	\read\tmp to \thechar%
+	\closein\tmp%
+}
+
+\newcommand{\quickwordcount}[1]{%
+	\immediate\write18{texcount -1 -sum -merge #1.tex > #1-words.sum}%
+	\openin\tmp=#1-words.sum%
+	\read\tmp to \theword%
+	\closein\tmp%
+}
+
+
+
+\title{Deep Learning and Generative Networks for the simulation of high-energy physics events}
+\author{Student: Francesco Vaselli \and
+	Advisor: Prof. Andrea Rizzi}
+\date{Abstract, full thesis to be discussed on 14/09/2022}
+
+\begin{document}
+	\maketitle
+	%\quickwordcount{main}
+	%\quickcharcount{main}
+	
+	%There are \thechar characters and approximately \theword spaces.
+	%That makes approximately \the\numexpr\theword+\thechar\relax\ characters total.
+	%\pagenumbering{gobble}
+	
+	\section*{Introduction and problem framing}
+	In recent years, \emph{machine learning} techniques have been massively adopted by scientific collaboration around the world. In particular, a paradigm known as \emph{deep learning}, which leverages multiple layers of \emph{artificial neurons} (theorized by \cite{Rosenblatt1958ThePA}) trained through the use of a \emph{loss function} and \emph{backpropagation}, has achieved a wide range of applications. Even a simple overview of the subject would be far beyond the scope of this section; we thus limit ourselves to the class of \emph{generative models}.
+	
+	In the physical sciences, the need for trustworthy and robust event generation is usually tackled by \emph{Monte Carlo methods}, with state of the art libraries (such as \cite{AGOSTINELLI2003250}) capable of achieving remarkable results at the cost of computational complexity and computing times. The generated data structure is usually tabular or sparse, but may vary greatly between different experiments and collaborations. On the other hand, research in the field of computer vision has fuelled development of remarkable deep learning models, focused mainly on image generation. \emph{Generative Adversarial Networks} (GANs) \cite{goodfellow2014generative}, \emph{Variational Autoencorders} (VAEs) \cite{kingma2014autoencoding} and \emph{Normalizing Flows} \cite{rezende2016variational} are some of the most successful frameworks developed thus far. However, such tools remain geared towards the necessities of industry; much work remains to be done to enable the use of this technologies in real, hard sciences applications.
+	
+	\section*{Thesis work and personal contribution}
+	
+	The main aim of our current work is to enable fast and reliable  deep learning event generation for the study of the process H $\xrightarrow{} \mu^+ \mu^-$ at the CMS experiment. Specifically, we aim to reproduce (i.e. learn from) the NANOAOD event data \cite{2019EPJWC.21406021R} by avoiding the full simulation of the sample and instead producing it in a fraction of the time and computing power, a process we call \emph{flash sim}.
+	
+	Both GANs and VAEs have been extensively investigated by the collaboration at CERN (see \cite{2019glhc} and \cite{otten2021event}); despite this, there is a limited literature regarding behavior in low dimensionality as in our case, e.g. \cite{523096}. We started by focusing on GANs, through the use of state of the art libraries such as Tensorflow \cite{tensorflow2015-whitepaper} and Pytorch \cite{NEURIPS2019_9015}. Despite some convincing results in published works, this approaches remain plagued by problems such as \emph{mode collapse}, where the generator over-optimizes for a particular discriminator, and the discriminator never manages to learn its way out of the trap. As a result the generators rotate through a small set of output types, degrading the statistical significance of generated samples. Another common occurrence is failure to converge, due to the peculiar minmax nature of the training.
+	We spent a few months investigating possible remedies and architectures, such as \emph{Wasserstein Loss}, which implements a loss metric from the \emph{earth mover distance} between the real and generated distributions (see \cite{arjovsky2017wasserstein}), or \emph{Unrolled GAN}s, which use a generator loss function that incorporates not only the current discriminator's classifications, but also the outputs of future discriminator versions (see \cite{metz2017unrolled}). We also implemented a custom \emph{Bitted GAN}, trained on binarized data aiming to directly predict the bin in the histogram output distributions.
+	Unfortunately, we obtained no meaningful results, and simple tests performed for VAEs yielded similar outcomes.
+	
+	We thus turned to the approach of Normalizing Flows, a family of methods for constructing flexible learnable probability distributions, often with neural networks, which allow us to surpass the limitations of simple parametric forms to represent complex high-dimensional distributions. In this case, a simple multivariate source of noise, for example a standard i.i.d. normal distribution, $X\sim\mathcal{N}(\mathbf{0},I_{D\times D})$, is passed through a vector-valued invertible bijection, $g:\mathbb{R}^D\rightarrow\mathbb{R}^D$, to produce the more complex transformed variable $Y=g(X)$.
+	Sampling $Y$ is trivial and involves evaluation of the forward pass of $g$. We can score $Y$ using the multivariate substitution rule of integral calculus:
+	
+	\begin{equation*}
+    \begin{aligned}
+	\mathbb{E}_{p_X(\cdot)}\left[f(X)\right] &= \int_{\text{supp}(X)}f(\mathbf{x})p_X(\mathbf{x})d\mathbf{x}\\
+	&= \int_{\text{supp}(Y)}f(g^{-1}(\mathbf{y}))p_X(g^{-1}(\mathbf{y}))\det\left|\frac{d\mathbf{x}}{d\mathbf{y}}\right|d\mathbf{y}\\
+	&= \mathbb{E}_{p_Y(\cdot)}\left[f(g^{-1}(Y))\right]
+	\end{aligned}
+	\end{equation*}
+
+where $d\mathbf{x}/d\mathbf{y}$ denotes the Jacobian matrix of $g^{-1}(\mathbf{y})$. Equating the last two lines we get:
+
+\begin{equation*}
+	\begin{aligned}
+	\log(p_Y(y)) &= \log(p_X(g^{-1}(y)))+\log\left(\det\left|\frac{d\mathbf{x}}{d\mathbf{y}}\right|\right)\\
+	&= \log(p_X(g^{-1}(y)))-\log\left(\det\left|\frac{d\mathbf{y}}{d\mathbf{x}}\right|\right)
+	\end{aligned}
+\end{equation*}
+
+Intuitively, this equation says that the density of $Y$ is equal to the density at the corresponding point in $X$ plus a term that corrects for the warp in volume around an infinitesimally small volume around $Y$ caused by the transformation.
+We can compose such bijective transformations to produce even more complex distributions. By an inductive argument, if we have $L$ transforms $g_{(0)}, g_{(1)},\ldots,g_{(L-1)}$, then the log-density of the transformed variable $Y=(g_{(0)}\circ g_{(1)}\circ\cdots\circ g_{(L-1)})(X)$ is:
+
+\begin{equation*}
+	\begin{aligned}
+		\log(p_Y(y)) &= \log\left(p_X\left(\left(g_{(L-1)}^{-1}\circ\cdots\circ g_{(0)}^{-1}\right)\left(y\right)\right)\right)+\sum^{L-1}_{l=0}\log\left(\left|\frac{dg^{-1}_{(l)}(y_{(l)})}{dy'}\right|\right)
+	\end{aligned}
+\end{equation*}
+
+where we've defined $y_{(0)}=x$, $y_{(L-1)}=y$ for convenience of notation.
+
+The main challenge is in designing parametrizable multivariate bijections that have closed form expressions for both $g$ and $g^{-1}$, a tractable Jacobian whose calculation scales with $O(D)$ rather than $O(D^3)$, and can express a flexible class of functions. Recent advancements have demonstrated the suitability of \emph{spline transforms} (see \cite{durkan}).
+
+The theory of Normalizing Flows is easily generalized to conditional distributions. We denote the variable to condition on by $C=\mathbf{c}\in\mathbb{R}^M$. A simple multivariate source of noise, for example a standard i.i.d. normal distribution, $X\sim\mathcal{N}(\mathbf{0},I_{D\times D})$, is passed through a vector-valued bijection that also conditions on C, $g:\mathbb{R}^D\times\mathbb{R}^M\rightarrow\mathbb{R}^D$, to produce the more complex transformed variable $Y=g(X;C=\mathbf{c})$. In practice, this is usually accomplished by making the parameters for a known normalizing flow bijection $g$ the output of a hypernet neural network that inputs $\mathbf{c}$. It is thus straightforward to condition event generation on the ground truth employed for the Montecarlo target.
+
+Heavily inspired by the work of Stephen Green (\cite{green2020complete}), we built a  neural spline normalizing flow composed of 15 layers and successfully learned to reproduce 15 variables for Jets from a NANOAOD sample of 1e6 events. Both the 1-d Wasserstein distance form real sample distributions and correlations prove the goodness of the current approach.
+
+Future work will see us working toward realistic simulation of all the target variables for the  H $\xrightarrow{} \mu^+ \mu^-$ events, as well as looking into possible extension into \emph{Quantum Machine Learning} (as in \cite{chang2021quantum}).
+
+	%\nocite{*}
+	\bibliographystyle{plain}
+	\bibliography{bibliography.bib}
+\end{document}
