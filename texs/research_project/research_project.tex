@@ -1,0 +1,61 @@
+\documentclass{scrartcl} % KOMA-Script article scrartcl
+\usepackage[utf8]{inputenc}
+\usepackage{appendix}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{url}
+\usepackage{caption}
+\usepackage{subfig}
+\newread\tmp
+
+\title{Accelerating HEP research: \\A Deep Learning framework}
+\author{Francesco Vaselli}
+\date{Pisa, 22/02/2022}
+
+\begin{document}
+	\maketitle
+	%\quickwordcount{main}
+	%\quickcharcount{main}
+	
+	%There are \thechar characters and approximately \theword spaces.
+	%That makes approximately \the\numexpr\theword+\thechar\relax\ characters total.
+	%\pagenumbering{gobble}
+	
+	\section*{Introduction}
+	The need for fast and reliable computing methods in the physical sciences, notably in the high-energy field, has fueled much of the technological progress of modern times. Despite this, the average physicist has generally little time to spend on innovating and improving its computing toolkit, and has to content himself with boilerplate solutions. This is especially true in highly specialized fields, such as HEP, which purse a wide variety of research directions.
+	
+	Specifically, in recent years, \emph{machine learning} techniques have been massively adopted by scientific collaborations around the world. In particular, the paradigm known as \emph{deep learning}, which leverages multiple layers of \emph{artificial neurons} (theorized by \cite{Rosenblatt1958ThePA}) trained through the use of a \emph{loss function} and \emph{backpropagation}, has achieved a wide range of successful usages. However, such tools remain geared towards the necessities of industry; much work remains to be done to enable the use of this technologies in hard sciences.
+	
+	As a physicist with a keen interest in this type of applications, while still retaining useful domain knowledge, I am convinced that I could achieve significant results by pursuing the following research directions. 
+
+	
+	\section*{Research topics}
+	
+	What follows is a series of deep learning tools addressing the necessities of Run 3/ High Luminosity LHC: the HL-LHC will produce more than 250 inverse femtobarns of data per year and will be capable of collecting up to 4000 inverse femtobarns, making it possible to set new constrainst on a whole set of processes regarding the Higgs boson, such as its coupling to fermions of the second generation or the Higgs self-coupling. The vast amount of data will require efficient and fast \emph{simulation techniques}, improvements in both \emph{tracking} and \emph{vertex reconstruction}, as well as reliable \emph{trigger} and \emph{real time} analysis frameworks.
+	
+	\subsection*{Flash sim}
+	This is the topic that I am currently pursuing with my Master thesis. The key idea is to directly generate a high level analysis format, such as CMS NANOAOD \cite{2019EPJWC.21406021R}, training on fully simulated events. As a benchmark to evaluate the performance of such a simulation, the search data for the decay of Higgs to muon pairs in the VBF channel has been chosen. This kind of analysis requires only a limited number of muons and jets features to be simulated while still depending upon proper handling of correlations, so it is a good benchmark for a first prototype of this deep learning based approach. The goal of this kind of simulation, that we call \emph{flash sim}, is to generate the full detector response (simulation and reconstruction) in a negligible time compared to a full simulation, hence enabling the generation of future large datasets at low computing cost.
+	
+	\emph{Generative Adversarial Networks} (GANs) \cite{goodfellow2014generative} and \emph{Variational Autoencorders} (VAEs) \cite{kingma2014autoencoding} are deep generative models which showed remarkable results in the field of computer vision, and have already been extensively investigated by the collaboration at CERN (see \cite{2019glhc} and \cite{otten2021event}); despite this, there is still a limited literature regarding behavior in low dimensionality as in our case, e.g. \cite{523096}. This models are also prone to \emph{mode collapse} and failure to converge, and necessitate careful and domain-informed tuning to result in successful HEP applications.
+	
+	A novel and promising approach is the one offered by Normalizing Flows \cite{rezende2016variational}, a family of methods for constructing flexible learnable probability distributions, often with neural networks, which allow us to surpass the limitations of simple parametric forms to represent complex high-dimensional distributions. In this case, a simple multivariate source of noise, for example a standard i.i.d. normal distribution, $X\sim\mathcal{N}(\mathbf{0},I_{D\times D})$, is passed through a vector-valued invertible bijection, $g:\mathbb{R}^D\rightarrow\mathbb{R}^D$, to produce the more complex transformed variable $Y=g(X)$, and we can compose such bijective transformations to produce even more complex distributions, i.e. $Y=(g_{(0)}\circ g_{(1)}\circ\cdots\circ g_{(L-1)})(X)$.
+	
+	The main challenge is in designing parametrizable multivariate bijections that have closed form expressions for both $g$ and $g^{-1}$, a tractable Jacobian whose calculation scales with $O(D)$ rather than $O(D^3)$, and can express a flexible class of functions. Recent advancements have demonstrated the suitability of \emph{spline transforms} (see \cite{durkan}), and my Master thesis showed promising results in the generation of samples which provide convincing distributions as well as correct correlations and conditioning on the simulation ground truth.
+	
+	Still, lots of potential application and improvements of this architecture for both generation and inference (see \cite{green2020complete}) could be investigated.
+
+\subsection*{Deep vertex and tracking}
+
+\subsection*{Trigger and real time analysis}
+	
+	%\nocite{*}
+	\bibliographystyle{plain}
+	\bibliography{bibliography.bib}
+\end{document}

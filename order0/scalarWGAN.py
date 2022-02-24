@@ -64,7 +64,7 @@ class Discriminator(nn.Module):
             nn.ReLU(True),
 
             nn.Linear(16, 1),
-            nn.Sigmoid()
+            nn.LeakyReLU()
 
         )
 
@@ -148,7 +148,9 @@ if __name__ == '__main__':
             data = data.clone().detach().requires_grad_(True)
             # torch.tensor(data, dtype=torch.float)
             real_cpu = data.to(device)
+            print(real_cpu)
             b_size = real_cpu.size(0)
+            print(b_size)
             # Forward pass real batch through D
             output = netD(real_cpu).view(-1)
             # Calculate loss on all-real batch

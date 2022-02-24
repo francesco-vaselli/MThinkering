@@ -28,7 +28,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         self.ngpu = ngpu
 
-        self.label_conditioned_generator = nn.Sequential(nn.Embedding(n_classes, embedding_dim),
+        self.label_conditioned_generator = nn.Sequential(nn.Embedding(2, embedding_dim),
                       nn.Linear(embedding_dim, 16))
         
     
@@ -68,7 +68,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
 
-        self.label_condition_disc = nn.Sequential(nn.Embedding(n_classes, embedding_dim),
+        self.label_condition_disc = nn.Sequential(nn.Embedding(2, embedding_dim),
 	                      nn.Linear(embedding_dim, nc))
 
         self.main = nn.Sequential(

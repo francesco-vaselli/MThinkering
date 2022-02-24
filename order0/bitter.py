@@ -38,6 +38,38 @@ def bitter(data, bin_exp):
     return bin_edges, bits
 
 
+def ndebitter(bits, bin_edges):
+
+    bins_0 = np.where(bits[:, 0]==1, 2, 1)
+    bins_other = np.where(bits[:, 1:]==1, bits[:, 1:]+bits[:, 1:], bits[:, 1:]+(bits[:, 1:]-1)).sum(axis=1)
+    print(bins_0, bins_other)
+    nbins = np.sum([bins_0, bins_other], axis=0)
+    print(nbins)
+
+    
+    bins = []
+    for _, bit in enumerate(bits):
+        if bit[0] == 1:
+            bin = 2
+        else:
+            bin = 1
+
+        for j in range(1, len(bit)):
+            if bit[j] == 1:
+                bin += bin
+            else:
+                bin += (bin -1)
+        
+        bins.append(bin)
+    
+    bins = np.array(nbins)
+    hist_min = bin_edges.min()
+    bin_width = np.ediff1d(bin_edges)[0]
+    histed = hist_min + bin_width*(bins -0.5)
+    
+    return histed
+
+
 def debitter(bits, bin_edges):
 
     bins = []
@@ -57,10 +89,8 @@ def debitter(bits, bin_edges):
     
     bins = np.array(bins)
     hist_min = bin_edges.min()
-    print(hist_min)
     bin_width = np.ediff1d(bin_edges)[0]
-    hist_centre = lambda t: hist_min + bin_width*(t-0.5)
-    histed = np.vectorize(hist_centre)(bins)
+    histed = hist_min + bin_width*(bins -0.5)
     
     return histed
 
@@ -82,7 +112,10 @@ if __name__ == '__main__':
 
     bin_edges, bitted = bitter(full, 7)
     print(full[10], bitted[10])
-    histed = debitter(bitted, bin_edges)
+    histed = ndebitter(bitted, bin_edges)
+    print(histed)
+    t = timeit.Timer(lambda: debitter(bitted, bin_edges)) 
+    print (t.timeit(1))
     f = plt.figure()
     plt.hist(histed, bins=bin_edges)
 

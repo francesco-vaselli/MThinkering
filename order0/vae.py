@@ -126,7 +126,7 @@ if __name__ == '__main__':
     model = VAE().to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    epochs = 150
+    epochs = 15
     for epoch in range(1, epochs + 1):
         train(epoch, dataloader)
 
