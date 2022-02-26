@@ -53,7 +53,43 @@
 
 \subsection*{Deep vertex and tracking}
 
+Possibly considered the holy grail of ML for HEP applications at the LHC, the problem of \emph{track reconstruction} is mostly a pattern recognition task whose complexity grows much more than linearly with the increase of number of collisions, hence the number of tracks, and is thus expected to be one of the main problems for HL-LHC. When investigating such a large feature space, a common approach is to reduce the complexity of the network while still retaining useful information about local features through the use of \emph{Convolutional Neural Networks} (CNNs), which nowadays are the standard approach for image datasets (as pioneered in \cite{simonyan2015deep}).
+Unfortunately, any representation of tracking detector as images
+would look very sparse and would not benefit of the locality idea of the CNN. 
+
+Another hard HEP problem is the reconstruction of secondary vertices used for b-tagging. In order to identify b-jets, a useful feature is the presence of the so called \emph{secondary
+vertices} in a jet, i.e. points in space, displaced from the interaction point, where a group of tracks
+appears to originate from. A deep learning approach named \emph{Deep Vertex} already exists, but it is implemented with CNN, thus limiting itself to a specific input format.
+
+A promising way to overcome these challenges is the introduction of \emph{Graph Networks} (GNs), which represent input and output data as graphs to exploit any invariance of the graph itself in order to perform the dimensionality reduction that is achieved in CNN. In the case of a GN, the locality is not based on an euclidean metric like as before, but rather on the number of connections needed to reach one node from another. In order to enforce this kind of locality, a \emph{Message Passing} schema is often used for GN: the computation happens in several iterations where each iteration propagates information to/from neighbor nodes. Even a simple overview of the method goes beyond the scope of this section: we will now comment briefly on specific HEP advantages of this architecture, referring the reader to the seminal work of Battaglia \emph{et al.} \cite{battaglia2018relational} for a comprehensive review.
+
+The key idea behind GNs in HEP is to represent the data as a graph where the nodes are the hits (i.e. the individual measurements from tracking sensors) and nodes of subsequent
+layers are connected (with some pruning of nonphysical connections). The output is instead a graph made of several disconnected branches each representing an
+individual track (or track seed). We would like to emphasize how a \emph{graph input topology} would possibly benefit many other models already in use at LHC, allowing a better application simply by performing a preprocessing step through the use of GN layers.
+
+Due to the novelty of the approach, I could first deepen my knowledge of such methods this spring during my period as visiting student at CMS, acquiring the resources needed to start addressing real problems at the beginning of the PhD.
+
 \subsection*{Trigger and real time analysis}
+
+\emph{Field-programmable gate arrays} (FPGAs) have been used for
+decades to provide fast computing solutions, and are a cornerstone of modern trigger implementations. Their programming is  traditionally done in Verilog/VHDL, i.e. low-level hardware languages: it si usally possible to translate C to Verilog/VHDL using High Level Synthesis (HLS) tools. Recent efforts have demonstrated the advantages of Deep Learning approaches to the problem of triggering, and produced a tool know as \emph{hls4ml} \cite{trg2018} for the compression and implementation of Neural networks through the use of FPGAs.
+
+\emph{non so bene che altro scrivere}
+
+Various researchers at the Pisa INFN section are already working extensively of FPGAs and trigger systems, providing the ideal ground for and early training and subsequent testing of ML methods for triggering during the rest of my PhD.
+
+\subsection*{Quantum Machine Learning for HEP}
+
+Finally, a novel discipline born from \emph{Quantum Computing} and ML, known as \emph{Quantum Machine Learning} (QML) is already under serious investigation from the scientific community, due to the potential and significant \emph{quantum} advantages. The limits of what machines can learn have always been defined by the computer hardware we run our algorithms on—for example, the success of modern-day deep learning with neural networks is enabled by parallel GPU clusters.
+
+Quantum machine learning extends the pool of hardware for machine learning by an entirely new type of computing device—the \emph{quantum computer}. Some research focuses on ideal, universal quantum computers (“fault-tolerant QPUs”) which are still years away. But there is rapidly-growing interest in quantum machine learning on near-term quantum devices (\emph{Noisy Intermediate-Scale Quantum} or NISQ).
+
+We can understand these devices as special-purpose hardware like Application-Specific Integrated Circuits (ASICs) and Field-Programmable Gate Arrays (FPGAs), which are more limited in their functionality but nonetheless well suited to specific applications. In the modern viewpoint, quantum computers can be used and trained like neural networks. We can systematically adapt the physical control parameters, such as an electromagnetic field strength or a laser pulse frequency, to solve a problem. Additionally, quantum circuits are differentiable, and a quantum computer itself can compute the change in control parameters needed to become better at a given task. Trainable quantum circuits can be leveraged in other fields like quantum chemistry or quantum optimization. It can help in a variety of applications such as the design of quantum algorithms, the discovery of quantum error correction schemes, and the understanding of physical systems.
+
+At the moment the effort of the HEP community is focused on quantum generative models (see \cite{chan2021quantum}), where the noisy behavior is mitigated or even beneficial. The CERN has already established a pertnership with IBM, a leading competitor for quantum technologies, and founded the CERN Quantum Technology Initiative (CERN QTI), a comprehensive R$\&$D, academic and knowledge-sharing initiative to exploit quantum advantage for high-energy physics and beyond. 
+
+As a novel and exciting field, I would have lots of possible research direction, starting from possible extension of my Master thesis work and possibly developing entirely novel approaches. Both the SNS, with its dedicated courses in Quantum Information, and the INFN, a member of various LHC collaborations, would serve as the perfect starting point for this direction of research.
+
 	
 	%\nocite{*}
 	\bibliographystyle{plain}
