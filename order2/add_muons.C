@@ -1,22 +1,15 @@
-#define M_PI 3.14159265358979323846
 
-// curr not working as intended (extra dims)
 auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1, ROOT::VecOps::RVec<float> &Phi2) {
-	ROOT::VecOps::RVec<float> dphi = Phi1 - Phi2;
-	auto thisSize = dphi.size();
-   	ROOT::VecOps::RVec<float> diff;
-	diff.reserve(thisSize);
-        for (auto &&val : dphi) {
-		if ( val > M_PI ) {
-        		val -= 2.0*M_PI;
-			diff.emplace_back(val);
-        	} else if ( val <= -M_PI ) {
-               		val += 2.0*M_PI;
-			diff.emplace_back(val);
-        	}
+	auto size = Phi1.size();
+   	ROOT::VecOps::RVec<float> dphis;
+	dphis.reserve(size);
+    for (size_t i = 0; i < size; i++) {
+        Double_t dphi = TVector2::Phi_mpi_pi(Phi1[i]-Phi2[i]);
+        dphis.emplace_back(dphi);
 	}
-        return diff;
-      }
+        return dphis;
+    }
+
 
 
 auto closest_muon_dr(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float> & phij, ROOT::VecOps::RVec<float> & etam, ROOT::VecOps::RVec<float> & phim) {
@@ -254,11 +247,6 @@ void add_muons(){
 	// Print column type
 	std::cout << "Column MjG " << " has type " << colType2 << std::endl;
 	
-	//auto d2 = d_def.Display({"JetMask", "MatchedGenJets"});
-	// Printing the short representations, the event loop will run
-	// std::cout<<d2->Print();
-	// d_def.Foreach([](ROOT::VecOps::RVec<int> k, ROOT::VecOps::RVec<int> i, ROOT::VecOps::RVec<int> j){ std::cout<<k<<i<<j<<std::endl;}, {"Jet_genJetIdx","JetMask", "MatchedGenJets"});
-	// d_def.Foreach([](ROOT::VecOps::RVec<int> j){ operator<<(std::cout,j);}, {"MatchedGenJets"});
 	std::vector<std::string> gen_vars = { "GenJet_eta", "GenJet_mass", "GenJet_phi", "GenJet_pt", "GenJet_partonFlavour", "GenJet_hadronFlavour" };
 	auto d_matched = d_def.Define("MGenJet_eta", "Take(GenJet_eta,MatchedGenJets)")
 				.Define("MGenJet_mass", "Take(GenJet_mass,MatchedGenJets)")
@@ -315,8 +303,8 @@ void add_muons(){
 				.Define("MJet_neEmEF", "Jet_neEmEF[JetMask]")
 				.Define("MJet_neHEF", "Jet_neHEF[JetMask]")
 				.Define("MJet_partonFlavour", "Jet_partonFlavour[JetMask]")
-				.Define("MJet_phiMinusGen", "Jet_phi[JetMask]-MGenJet_phi")
-				//.Define("MJet_phiMinusGen", DeltaPhi,{"MJet_phi", "MGenJet_phi"})
+				.Define("MJet_phifiltered", "Jet_phi[JetMask]")
+				.Define("MJet_phiMinusGen", DeltaPhi,{"MJet_phifiltered", "MGenJet_phi"})
 				.Define("MJet_ptRatio", "Jet_pt[JetMask]/MGenJet_pt")
 				.Define("MJet_puId", "Jet_puId[JetMask]")
 				.Define("MJet_hfadjacentEtaStripsSize", "Jet_hfadjacentEtaStripsSize[JetMask]")
