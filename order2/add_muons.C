@@ -7,7 +7,7 @@ auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1, ROOT::VecOps::RVec<float> &Phi2) 
         Double_t dphi = TVector2::Phi_mpi_pi(Phi1[i]-Phi2[i]);
         dphis.emplace_back(dphi);
 	}
-        return dphis;
+    return dphis;
     }
 
 
@@ -318,13 +318,11 @@ void add_muons(){
 	auto v2 = d_matched.GetColumnNames();
 	// for (auto &&colName : v2) std::cout <<"\""<< colName<<"\", ";
 	vector<string> col_to_save = 
-		{"MGenJet_eta", "MClosestMuon_dr", "MClosestMuon_pt", "MClosestMuon_deta", "MClosestMuon_dphi", "MSecondClosestMuon_dr", "MSecondClosestMuon_pt",
-			"MSecondClosestMuon_deta", "MSecondClosestMuon_dphi"};
-		
-		// "MGenJet_mass", "MGenJet_phi", "MGenJet_pt", "MGenJet_partonFlavour", "MGenJet_hadronFlavour", "MJet_area", "MJet_bRegCorr", "MJet_bRegRes",		"MJet_btagCMVA", "MJet_btagCSVV2", "MJet_btagDeepB", "MJet_btagDeepC", "MJet_btagDeepCvB", "MJet_btagDeepCvL","MJet_btagDeepFlavB", "MJet_btagDeepFlavC", "MJet_btagDeepFlavCvB", "MJet_btagDeepFlavCvL", "MJet_btagDeepFlavQG", "MJet_cRegCorr", "MJet_cRegRes", 
-		// 	"MJet_chEmEF", "MJet_chFPV0EF", "MJet_chFPV1EF", "MJet_chFPV2EF", "MJet_chFPV3EF", "MJet_chHEF", "MJet_cleanmask", "MJet_etaMinusGen", "MJet_hfsigmaEtaEta", "MJet_hfsigmaPhiPhi", "MJet_hadronFlavour","MJet_hfadjacentEtaStripsSize","MJet_hfcentralEtaStripSize",
-		//  	"MJet_jetId", "MJet_mass", "MJet_muEF", "MJet_muonSubtrFactor", "MJet_nConstituents", "MJet_nElectrons", "MJet_nMuons", "MJet_neEmEF", "MJet_neHEF",
-		// 	"MJet_massRatio", "MJet_partonFlavour", "MJet_phiMinusGen", "MJet_ptRatio", "MJet_puId", "MJet_puIdDisc", "MJet_qgl", "MJet_rawFactor"};
+		{"MClosestMuon_dr", "MClosestMuon_pt", "MClosestMuon_deta", "MClosestMuon_dphi", "MSecondClosestMuon_dr", "MSecondClosestMuon_pt",
+			"MSecondClosestMuon_deta", "MSecondClosestMuon_dphi", "MGenJet_eta", "MGenJet_mass", "MGenJet_phi", "MGenJet_pt", "MGenJet_partonFlavour", "MGenJet_hadronFlavour", "MJet_area", "MJet_bRegCorr", "MJet_bRegRes",		"MJet_btagCMVA", "MJet_btagCSVV2", "MJet_btagDeepB", "MJet_btagDeepC", "MJet_btagDeepCvB", "MJet_btagDeepCvL","MJet_btagDeepFlavB", "MJet_btagDeepFlavC", "MJet_btagDeepFlavCvB", "MJet_btagDeepFlavCvL", "MJet_btagDeepFlavQG", "MJet_cRegCorr", "MJet_cRegRes", 
+			"MJet_chEmEF", "MJet_chFPV0EF", "MJet_chFPV1EF", "MJet_chFPV2EF", "MJet_chFPV3EF", "MJet_chHEF", "MJet_cleanmask", "MJet_etaMinusGen", "MJet_hfsigmaEtaEta", "MJet_hfsigmaPhiPhi", "MJet_hadronFlavour","MJet_hfadjacentEtaStripsSize","MJet_hfcentralEtaStripSize",
+		 	"MJet_jetId", "MJet_mass", "MJet_muEF", "MJet_muonSubtrFactor", "MJet_nConstituents", "MJet_nElectrons", "MJet_nMuons", "MJet_neEmEF", "MJet_neHEF",
+			"MJet_massRatio", "MJet_partonFlavour", "MJet_phiMinusGen", "MJet_ptRatio", "MJet_puId", "MJet_puIdDisc", "MJet_qgl", "MJet_rawFactor"};
 
 	d_matched.Snapshot("MJets", "MJets.root", col_to_save);
 
