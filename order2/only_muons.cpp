@@ -3,12 +3,12 @@ auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1, ROOT::VecOps::RVec<float> &Phi2) 
 	auto size = Phi1.size();
    	ROOT::VecOps::RVec<float> dphis;
 	dphis.reserve(size);
-    for (size_t i = 0; i < size; i++) {
-        Double_t dphi = TVector2::Phi_mpi_pi(Phi1[i]-Phi2[i]);
-        dphis.emplace_back(dphi);
+	for (size_t i = 0; i < size; i++) {
+		Double_t dphi = TVector2::Phi_mpi_pi(Phi1[i]-Phi2[i]);
+		dphis.emplace_back(dphi);
 	}
-    return dphis;
-    }
+	return dphis;
+	}
 
 
 auto closest_jet_dr(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float> & phij, ROOT::VecOps::RVec<float> & etam, ROOT::VecOps::RVec<float> & phim) {
@@ -22,8 +22,8 @@ auto closest_jet_dr(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float> 
 		float closest = 0.4;
 		for (size_t j = 0; j < size_inner; j++) {
 			Double_t deta = etam[i]-etaj[j];
-      		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
-      		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
+	  		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
+	  		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
 			if (dr < closest) {
 				closest = dr;
 			}
@@ -48,8 +48,8 @@ auto closest_jet_mass(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float
 		float closest = 0.4;
 		for (size_t j = 0; j < size_inner; j++) {
 			Double_t deta = etam[i]-etaj[j];
-      		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
-      		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
+	  		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
+	  		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
 			if (dr < closest) {
 				closest = dr;
 				masses[i] = massj[j];
@@ -72,8 +72,8 @@ auto closest_jet_pt(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float> 
 		float closest = 0.4;
 		for (size_t j = 0; j < size_inner; j++) {
 			Double_t deta = etam[i]-etaj[j];
-      		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
-      		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
+	  		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
+	  		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
 			if (dr < closest) {
 				closest = dr;
 				pts[i] = ptj[j];
@@ -96,8 +96,8 @@ auto closest_jet_deta(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float
 		float closest = 0.4;
 		for (size_t j = 0; j < size_inner; j++) {
 			Double_t deta = etam[i]-etaj[j];
-      		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
-      		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
+	  		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
+	  		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
 			if (dr < closest) {
 				closest = dr;
 				detas[i] = deta;
@@ -120,8 +120,8 @@ auto closest_jet_dphi(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float
 		float closest = 0.4;
 		for (size_t j = 0; j < size_inner; j++) {
 			Double_t deta = etam[i]-etaj[j];
-      		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
-      		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
+	  		Double_t dphi = TVector2::Phi_mpi_pi(phim[i]-phij[j]);
+	  		float dr = TMath::Sqrt( deta*deta+dphi*dphi );
 			if (dr < closest) {
 				closest = dr;
 				dphis[i] = dphi;
@@ -137,20 +137,20 @@ auto BitwiseDecoder(ROOT::VecOps::RVec<int> &ints, int &bit) {
    	ROOT::VecOps::RVec<float> bits;
 	bits.reserve(size);
 	int num = pow(2, (bit - 1));
-    for (size_t i = 0; i < size; i++) {
-        Double_t bAND = ints[i] & num;
+	for (size_t i = 0; i < size; i++) {
+		Double_t bAND = ints[i] & num;
 		if (bAND == num) {
-        	bits.emplace_back(1);
+			bits.emplace_back(1);
 		}
 		else {bits.emplace_back(0);}
 	}
-    return bits;
-    }
+	return bits;
+	}
 
 
 void only_muons(){
-        ROOT::EnableImplicitMT();
-        ROOT::RDataFrame d("Events","../data/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
+		ROOT::EnableImplicitMT();
+		ROOT::RDataFrame d("Events","../data/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
 
 	// create first mask
 	auto d_def = d.Define("MuonMask", "Muon_genPartIdx >=0").Define("MatchedGenMuons", "Muon_genPartIdx[MuonMask]") ;
@@ -160,13 +160,13 @@ void only_muons(){
 	std::cout << "Column Pileup_gpudensity" << " has type " << colType1 << std::endl;
 
 	// .Define("MGenJet_eta", "Take(GenJet_eta,MatchedGenJets)")
-    //             .Define("MGenJet_mass", "Take(GenJet_mass,MatchedGenJets)")
+	//             .Define("MGenJet_mass", "Take(GenJet_mass,MatchedGenJets)")
 	// 			.Define("MGenJet_phi", "Take(GenJet_phi,MatchedGenJets)")
 	// 			.Define("MGenJet_pt", "Take(GenJet_pt,MatchedGenJets)")
 
 	std::vector<std::string> gen_vars = { "GenJet_eta", "GenJet_mass", "GenJet_phi", "GenJet_pt", "GenJet_partonFlavour", "GenJet_hadronFlavour" };
 	auto d_matched = d_def
-                .Define("MGenMuon_eta", "Take(GenPart_eta,MatchedGenMuons)")
+				.Define("MGenMuon_eta", "Take(GenPart_eta,MatchedGenMuons)")
 				.Define("MGenMuon_phi", "Take(GenPart_phi,MatchedGenMuons)")
 				.Define("MGenMuon_pt", "Take(GenPart_pt,MatchedGenMuons)")
 				.Define("MGenPart_statusFlags","Take(GenPart_statusFlags,MatchedGenMuons)")
@@ -184,19 +184,36 @@ void only_muons(){
 				.Define("MGenPart_statusFlags12", [](ROOT::VecOps::RVec<int> &ints){ int bit = 12; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
 				.Define("MGenPart_statusFlags13", [](ROOT::VecOps::RVec<int> &ints){ int bit = 13; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
 				.Define("MGenPart_statusFlags14", [](ROOT::VecOps::RVec<int> &ints){ int bit = 14; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
-                .Define("MClosestJet_dr", closest_jet_dr, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi"})
+				.Define("MClosestJet_dr", closest_jet_dr, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi"})
 				.Define("MClosestJet_deta", closest_jet_deta, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi"})
 				.Define("MClosestJet_dphi", closest_jet_dphi, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi"})
 				.Define("MClosestJet_pt", closest_jet_pt, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi", "GenJet_pt"})
-                .Define("MClosestJet_mass", closest_jet_mass, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi", "GenJet_mass"})
+				.Define("MClosestJet_mass", closest_jet_mass, {"GenJet_eta", "GenJet_phi","MGenMuon_eta", "MGenMuon_phi", "GenJet_mass"})
 				.Define("MMuon_etaMinusGen", "Muon_eta[MuonMask]-MGenMuon_eta")
-                .Define("MMuon_filteredphi", "Muon_phi[MuonMask]")
+				.Define("MMuon_filteredphi", "Muon_phi[MuonMask]")
 				.Define("MMuon_phiMinusGen", DeltaPhi, {"MMuon_filteredphi", "MGenMuon_phi"})
-                .Define("MMuon_ptRatio", "Muon_pt[MuonMask]/MGenMuon_pt")
+				.Define("MMuon_ptRatio", "Muon_pt[MuonMask]/MGenMuon_pt")
 				.Define("MMuon_dxy", "Muon_dxy[MuonMask]")
 				.Define("MMuon_dxyErr", "Muon_dxyErr[MuonMask]")
 				.Define("MMuon_dxybs", "Muon_dxybs[MuonMask]")
-				.Define("MMuon_dz", "Muon_dz[MuonMask]");
+				.Define("MMuon_dz", "Muon_dz[MuonMask]")
+				.Define("MMuon_dzErr", "Muon_dzErr[MuonMask]")
+				.Define("MMuon_ip3d", "Muon_ip3d[MuonMask]")
+				.Define("MMuon_isGlobal", "Muon_isGlobal[MuonMask]")
+				.Define("MMuon_isPFcand", "Muon_isPFcand[MuonMask]")
+				.Define("MMuon_isTracker", "Muon_isTracker[MuonMask]")
+				.Define("MMuon_jetPtRelv2", "Muon_jetPtRelv2[MuonMask]")
+				.Define("MMuon_jetRelIso", "Muon_jetRelIso[MuonMask]")
+				.Define("MMuon_mediumId", "Muon_mediumId[MuonMask]")
+				.Define("MMuon_pfRelIso03_all", "Muon_pfRelIso03_all[MuonMask]")
+				.Define("MMuon_pfRelIso03_chg", "Muon_pfRelIso03_chg[MuonMask]")
+				.Define("MMuon_pfRelIso04_all", "Muon_pfRelIso04_all[MuonMask]")
+				.Define("MMuon_ptErr", "Muon_ptErr[MuonMask]")
+				.Define("MMuon_sip3d", "Muon_sip3d[MuonMask]")
+				.Define("MMuon_softId", "Muon_softId[MuonMask]")
+				.Define("MMuon_softMva", "Muon_softMva[MuonMask]")
+				.Define("MMuon_softMvaId", "Muon_softMvaId[MuonMask]");
+				
 
 	// auto d_filtered = d_matched.Filter("MGenPart_statusFlags1 != 1");
 
@@ -209,7 +226,9 @@ void only_muons(){
 			"MGenPart_statusFlags5", "MGenPart_statusFlags6", "MGenPart_statusFlags7", "MGenPart_statusFlags8", "MGenPart_statusFlags9", "MGenPart_statusFlags10", "MGenPart_statusFlags11",
 			"MGenPart_statusFlags12", "MGenPart_statusFlags13", "MGenPart_statusFlags14", "MClosestJet_dr", "MClosestJet_deta", "MClosestJet_dphi", "MClosestJet_pt", "MClosestJet_mass",
 			"Pileup_gpudensity", "Pileup_nPU", "Pileup_nTrueInt", "Pileup_pudensity", "Pileup_sumEOOT", "Pileup_sumLOOT",
-            "MMuon_etaMinusGen", "MMuon_phiMinusGen", "MMuon_ptRatio", "MMuon_dxy", "MMuon_dxyErr", "MMuon_dxybs", "Muon_dz", };
+			"MMuon_etaMinusGen", "MMuon_phiMinusGen", "MMuon_ptRatio", "MMuon_dxy", "MMuon_dxyErr", "MMuon_dxybs", "MMuon_dz", "MMuon_dzErr", "MMuon_ip3d", "MMuon_isGlobal", "MMuon_isPFcand",
+			"MMuon_isTracker", "MMuon_jetPtRelv2","MMuon_jetRelIso", "MMuon_mediumId", "MMuon_pfRelIso03_all", "MMuon_pfRelIso03_chg", "MMuon_pfRelIso04_all", "MMuon_ptErr",
+			"MMuon_sip3d", "MMuon_softId", "MMuon_softMva", "MMuon_softMvaId"};
 
 	d_matched.Snapshot("MMuons", "MMuons.root", col_to_save);
 
