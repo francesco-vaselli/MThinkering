@@ -1,6 +1,18 @@
+auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1, ROOT::VecOps::RVec<float> &Phi2) {
+	auto size = Phi1.size();
+   	ROOT::VecOps::RVec<float> dphis;
+	dphis.reserve(size);
+	for (size_t i = 0; i < size; i++) {
+		Double_t dphi = TVector2::Phi_mpi_pi(Phi1[i]-Phi2[i]);
+		dphis.emplace_back(dphi);
+	}
+	return dphis;
+	}
+
+
 void maskToSelect(){
-        ROOT::EnableImplicitMT();
-        ROOT::RDataFrame d("Events","0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
+		ROOT::EnableImplicitMT();
+		ROOT::RDataFrame d("Events","0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
 
 	// create first mask
 	auto d_def = d.Define("JetMask","Jet_genJetIdx >=0  && Jet_genJetIdx < nGenJet").Define("MatchedGenJets","Jet_genJetIdx[JetMask]") ;
@@ -48,7 +60,7 @@ void maskToSelect(){
 				.Define("MJet_chFPV3EF", "Jet_chFPV3EF[JetMask]")			
 				.Define("MJet_chHEF", "Jet_chHEF[JetMask]")			
 				.Define("MJet_cleanmask", "Jet_cleanmask[JetMask]")			
-				.Define("MJet_eta", "Jet_eta[JetMask]/MGenJet_eta")
+				.Define("MJet_etaMinusGen", "Jet_eta[JetMask]-MGenJet_eta")
 				.Define("MJet_hfsigmaEtaEta", "Jet_hfsigmaEtaEta[JetMask]")		
 				.Define("MJet_hfsigmaPhiPhi", "Jet_hfsigmaPhiPhi[JetMask]")			
 				.Define("MJet_hadronFlavour", "Jet_hadronFlavour[JetMask]")		
@@ -63,8 +75,9 @@ void maskToSelect(){
 				.Define("MJet_neEmEF", "Jet_neEmEF[JetMask]")
 				.Define("MJet_neHEF", "Jet_neHEF[JetMask]")
 				.Define("MJet_partonFlavour", "Jet_partonFlavour[JetMask]")
-				.Define("MJet_phi", "Jet_phi[JetMask]/MGenJet_phi")
-				.Define("MJet_pt", "Jet_pt[JetMask]/MGenJet_pt")
+				.Define("MJet_phifiltered", "Jet_phi[JetMask]")
+				.Define("MJet_phiMinusGen", DeltaPhi,{"MJet_phifiltered", "MGenJet_phi"})
+				.Define("MJet_ptRatio", "Jet_pt[JetMask]/MGenJet_pt")
 				.Define("MJet_puId", "Jet_puId[JetMask]")
 				.Define("MJet_hfadjacentEtaStripsSize", "Jet_hfadjacentEtaStripsSize[JetMask]")
 				.Define("MJet_hfcentralEtaStripSize", "Jet_hfcentralEtaStripSize[JetMask]")
@@ -78,9 +91,9 @@ void maskToSelect(){
 	// for (auto &&colName : v2) std::cout <<"\""<< colName<<"\", ";
 	vector<string> col_to_save = 
 		{"MGenJet_eta", "MGenJet_mass", "MGenJet_phi", "MGenJet_pt", "MGenJet_partonFlavour", "MGenJet_hadronFlavour", "MJet_area", "MJet_bRegCorr", "MJet_bRegRes",		"MJet_btagCMVA", "MJet_btagCSVV2", "MJet_btagDeepB", "MJet_btagDeepC", "MJet_btagDeepCvB", "MJet_btagDeepCvL","MJet_btagDeepFlavB", "MJet_btagDeepFlavC", "MJet_btagDeepFlavCvB", "MJet_btagDeepFlavCvL", "MJet_btagDeepFlavQG", "MJet_cRegCorr", "MJet_cRegRes", 
-		"MJet_chEmEF", "MJet_chFPV0EF", "MJet_chFPV1EF", "MJet_chFPV2EF", "MJet_chFPV3EF", "MJet_chHEF", "MJet_cleanmask", "MJet_eta", "MJet_hfsigmaEtaEta", "MJet_hfsigmaPhiPhi", "MJet_hadronFlavour","MJet_hfadjacentEtaStripsSize","MJet_hfcentralEtaStripSize",
+		"MJet_chEmEF", "MJet_chFPV0EF", "MJet_chFPV1EF", "MJet_chFPV2EF", "MJet_chFPV3EF", "MJet_chHEF", "MJet_cleanmask", "MJet_etaMinusGen", "MJet_hfsigmaEtaEta", "MJet_hfsigmaPhiPhi", "MJet_hadronFlavour","MJet_hfadjacentEtaStripsSize","MJet_hfcentralEtaStripSize",
 		 "MJet_jetId", "MJet_mass", "MJet_muEF", "MJet_muonSubtrFactor", "MJet_nConstituents", "MJet_nElectrons", "MJet_nMuons", "MJet_neEmEF", "MJet_neHEF",
-"MJet_massRatio",		 "MJet_partonFlavour", "MJet_phi", "MJet_pt", "MJet_puId", "MJet_puIdDisc", "MJet_qgl", "MJet_rawFactor"};
+"MJet_massRatio",		 "MJet_partonFlavour", "MJet_phiMinusGen", "MJet_ptRatio", "MJet_puId", "MJet_puIdDisc", "MJet_qgl", "MJet_rawFactor"};
 
 	d_matched.Snapshot("MJets", "MJets.root", col_to_save);
 
