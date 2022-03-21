@@ -72,7 +72,7 @@ class H5Dataset(Dataset):
 		a, i = self.indices[index]
 		archive = self.archives[a]
 		y = archive["data"][i, 0:25]
-		x = archive["data"][i, 25:-1]
+		x = archive["data"][i, 25:47] # limit at -1 is not working as I would expect
 		y = torch.from_numpy(y)
 		x = torch.from_numpy(x)
 
@@ -505,12 +505,11 @@ def load_model(model_dir=None, filename=None):
 
 
 if __name__=='__main__':
-    # mp.set_start_method('spawn')
 
     train_ds = H5Dataset(['../muonData/muons1.hdf5', '../muonData/muons2.hdf5', '../muonData/muons3.hdf5', 
                             '../muonData/muons4.hdf5', '../muonData/muons5.hdf5', '../muonData/muons6.hdf5'])
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, pin_memory=True,  num_workers=9)
-    test_ds = H5Dataset(['../muonData/muons7.hdf5'])
+    test_ds = H5Dataset(['../muonData/muons7.hdf5'], limit=400000)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False, pin_memory=True,  num_workers=9)
     
 
@@ -522,7 +521,9 @@ if __name__=='__main__':
                 "hidden_dim" : 512
         }
         
-    flow = create_NDE_model(21, 25, 21, param_dict)
+    flow = create_NDE_model(22, 25, 22, param_dict)
+
+
     optimizer = torch.optim.Adam(flow.parameters(), lr=lr)
     flow.to(device)
 
