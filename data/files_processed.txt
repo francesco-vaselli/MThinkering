@@ -1,0 +1,7 @@
+1 /store/mc/RunIISummer20UL18NanoAODv2/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root
+2 /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/28FE3773-9C94-5E42-B6FB-64C997636881.root
+3 /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/89142AF0-003E-5549-A6C9-5C0A3FA912A4.root
+4  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/C600FF22-6CBA-6E4B-8FCF-192910F79D84.root
+5 /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/E1688267-29A9-D049-8B5F-FE4910D3A262.root
+6 /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/3A2B272C-E0EB-1748-A658-E5B58BBCFCBF.root
+7 /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root
