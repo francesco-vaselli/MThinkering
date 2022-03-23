@@ -22,85 +22,60 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class H5Dataset(Dataset):
-	"""Pytorch Dataset for reading input data from hdf5 files on disk
-	Datasets are lazy loaded as suggested by: https://vict0rs.ch/2021/06/15/pytorch-h5/
-	Expects hdf5 filese containing a "data" Dataset, which in turn contains correctly processed data
-	(there is no preprocessing here), and returns two separate tensor for each instance
-	x: target variables (expects a 25:-1 ordering on each row)
-	y: conditioning variables (expects a 0:25 ordering on each row)
+    """Pytorch Dataset for reading input data from hdf5 files on disk
+    Datasets are lazy loaded as suggested by: https://vict0rs.ch/2021/06/15/pytorch-h5/
+    Expects hdf5 filese containing a "data" Dataset, which in turn contains correctly processed data
+    (there is no preprocessing here), and returns two separate tensor for each instance
+    x: target variables (expects a 25:-1 ordering on each row)
+    y: conditioning variables (expects a 0:25 ordering on each row)
 
-	Args:
-		Dataset (Pytorch Dataset): Pytorch Dataset class
-	"""
-	def __init__(self, h5_paths, limit=-1):
-		"""Initialize the class, set indeces across datasets and define lazy loading
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset class
+    """
+    def __init__(self, h5_paths, limit=-1):
+        """Initialize the class, set indexes across datasets and define lazy loading
 
-		Args:
-			h5_paths (strings): paths to the various hdf5 files to include in the final Dataset
-			limit (int, optional): optionally limit dataset length to specified values, if negative 
-				returns the full length as inferred from files. Defaults to -1.
-		"""		
-		self.limit = limit
-		self.h5_paths = h5_paths
-		self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        Args:
+            h5_paths (strings): paths to the various hdf5 files to include in the final Dataset
+            limit (int, optional): optionally limit dataset length to specified values, if negative 
+                returns the full length as inferred from files. Defaults to -1.
+        """		
+        max_events = int(5e9)
+        self.limit = max_events if limit==-1 else int(limit)
+        self.h5_paths = h5_paths
+        self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
 
-		a_strides = []
-		idx_strides = []
-		for a, archive in enumerate(self.archives):
+        self.strides = []
+        for archive in self.archives:
+            with archive as f:
+                self.strides.append(len(f['data']))
 
-			a_length = len(archive["data"])
-			a_array = np.full(fill_value=a, shape=a_length)
-			idx_array = np.arange(a_length)
+        self.len_in_files = self.strides[1:]
+        self.strides = np.cumsum(self.strides)
+        self._archives = None
 
-			a_strides.append(a_array)
-			idx_strides.append(idx_array)
+    @property
+    def archives(self):
+        if self._archives is None: # lazy loading here!
+            self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        return self._archives
 
-		archive_full = np.concatenate(a_strides)
-		idx = np.concatenate(idx_strides) 
+    def __getitem__(self, index):
+        file_idx = np.searchsorted(self.strides, index, side='right')
+        idx_in_file = index - self.strides[max(0, file_idx-1)] 
+        y = self.archives[file_idx]["data"][idx_in_file, 0:25]
+        x = self.archives[file_idx]["data"][idx_in_file, 25:47]
+        y = torch.from_numpy(y)
+        x = torch.from_numpy(x)
 
-		self.indices = dict(enumerate(np.column_stack((archive_full, idx))))
-	
-		self._archives = None
+        return x, y
 
-	@property
-	def archives(self):
-		if self._archives is None: # lazy loading here!
-			self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
-		return self._archives
-
-	def __getitem__(self, index):
-		a, i = self.indices[index]
-		archive = self.archives[a]
-		y = archive["data"][i, 0:25]
-		x = archive["data"][i, 25:47] # limit at -1 is not working as I would expect
-		y = torch.from_numpy(y)
-		x = torch.from_numpy(x)
-
-		return x, y
-
-	def __len__(self):
-		if self.limit > 0:
-			return min([len(self.indices), self.limit])
-		return len(self.indices)
-
-class MyDataset(Dataset):
-
-  def __init__(self,file_name, start, stop):
-    df_r = pd.read_hdf(file_name, start=start, stop=stop)
-    df_r = df_r[~df_r.isin([np.nan, np.inf, -np.inf]).any(1)].astype('float32')
-    df_r = df_r.drop(["MGenPart_statusFlags2", "MGenPart_statusFlags12", "MGenPart_statusFlags14"], axis=1)
-
-    x = df_r.iloc[:, 25:-1].values
-    y= df_r.iloc[:,0:25].values
-
-    self.x_train=torch.tensor(x,dtype=torch.float32)#.to(device)
-    self.y_train=torch.tensor(y,dtype=torch.float32)#.to(device)
-
-  def __len__(self):
-    return len(self.y_train)
-  
-  def __getitem__(self,idx):
-    return self.x_train[idx],self.y_train[idx]
+    def __len__(self):
+        #return self.strides[-1] #this will process all files
+        if self.limit <= self.strides[-1]:
+            return self.limit
+        else:
+            return self.strides[-1]
 
 
 def create_linear_transform(param_dim):
@@ -245,9 +220,14 @@ def create_transform(num_flow_steps,
     transform = transforms.CompositeTransform([
         transforms.CompositeTransform([
             create_linear_transform(param_dim),
+            create_base_transform(0, param_dim, context_dim=context_dim,
+                                  batch_norm=False, **base_transform_kwargs)
+        ])] +
+        [transforms.CompositeTransform([
+            create_linear_transform(param_dim),
             create_base_transform(i, param_dim, context_dim=context_dim,
-                                  **base_transform_kwargs)
-        ]) for i in range(num_flow_steps)
+                                  batch_norm=True, **base_transform_kwargs)
+        ]) for i in range(1, num_flow_steps)
     ] + [
         create_linear_transform(param_dim)
     ])
@@ -516,12 +496,11 @@ if __name__=='__main__':
     
     param_dict = { "num_transform_blocks": 8,
                 "activation" : "elu",
-                "batch_norm" : True,
                 "num_bins" : 8,
                 "hidden_dim" : 512
-        }
+        } # batch norm removed and explicitly defined in consturctor
         
-    flow = create_NDE_model(22, 25, 22, param_dict)
+    flow = create_NDE_model(22, 25, 22, param_dict) # first block is defined separately without batchnorm
 
 
     optimizer = torch.optim.Adam(flow.parameters(), lr=lr)
