@@ -509,7 +509,7 @@ if __name__=='__main__':
                 "hidden_dim" : 256
         } # batch norm removed and explicitly defined in consturctor
         
-    flow = create_NDE_model(16, 20, 16, param_dict) # first tow  blocks are  defined separately without batchnorm
+    flow = create_NDE_model(16, 20, 16, param_dict) 
 
     total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)
     print(total_params)
