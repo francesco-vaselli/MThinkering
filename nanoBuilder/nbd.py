@@ -462,7 +462,7 @@ void gens(std::string x){
 if __name__=='__main__':
 	
 	# select nano aod, process and save intermmediate filesto disk
-	s = "../nanoaods/anaod1.root"
+	s = "../nanoaods/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root"
 	ROOT.gens(s)
 	print('done')
 	
@@ -489,7 +489,9 @@ if __name__=='__main__':
 	
 	dfm = tree.arrays(muon_cond, library="pd").astype('float32').dropna()
 	dfm = dfm[~dfm.isin([np.nan, np.inf, -np.inf]).any(1)]
-	dfm["MGenMuon_pt"] = dfm["MGenMuon_pt"].apply(lambda x: np.log(x))
+	phys_pt = dfm["MGenMuon_pt"].values # for later rescaling
+	print(phys_pt.shape) 
+	dfm["MGenMuon_pt"] = dfm["MGenMuon_pt"].apply(lambda x: np.log(x)) # for conditioning
 	dfm["MClosestJet_pt"] = dfm["MClosestJet_pt"].apply(lambda x: np.log1p(x))
 	dfm["MClosestJet_mass"] = dfm["MClosestJet_mass"].apply(lambda x: np.log1p(x))
 	dfm["Pileup_sumEOOT"] = dfm["Pileup_sumEOOT"].apply(lambda x: np.log(x))
@@ -704,7 +706,7 @@ if __name__=='__main__':
 	totalm[:, 1] = totalm[:, 1] +  dfm['MGenMuon_phi'].values
 	totalm[:, 1]= np.where( totalm[:, 1]< -np.pi, totalm[:, 1] + 2*np.pi, totalm[:, 1])
 	totalm[:, 1]= np.where( totalm[:, 1]> np.pi, totalm[:, 1] - 2*np.pi, totalm[:, 1])
-	totalm[:, 2] = totalm[:, 2] * dfm['MGenMuon_pt'].values
+	totalm[:, 2] = totalm[:, 2] * phys_pt 
 	print(totalm.shape)
 	
 	# trying to add charge...
@@ -728,5 +730,5 @@ if __name__=='__main__':
 	to_ttreel = ak.Array(to_ttreel)	
 	to_ttreel = ak.unflatten(to_ttreel, events_structure_el)
 
-	with uproot.recreate("synth_nanoaod_anal.root") as file:
+	with uproot.recreate("synth_nanoaod.root") as file:
 		file["Events"] = {'Jet': to_ttreej, 'Muon': to_ttreem, 'Electron': to_ttreel, 'event': to_ttreee.event, 'run': to_ttreee.run}
