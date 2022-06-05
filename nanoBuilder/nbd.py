@@ -397,12 +397,12 @@ auto charge(ROOT::VecOps::RVec<int> & pdgId) {
 	}
 
 void gens(std::string x){
-		ROOT::EnableImplicitMT();
+	//	ROOT::EnableImplicitMT();
 		ROOT::RDataFrame d("Events", x);
 	// create first mask
 	auto d_def = d.Define("MuonMask", "Muon_genPartIdx >=0").Define("MatchedGenMuons", "Muon_genPartIdx[MuonMask]")
 		//	.Define("JetMask","Jet_genJetIdx >=0  && Jet_genJetIdx < nGenJet").Define("MatchedGenJets","Jet_genJetIdx[JetMask]")
-			.Define("MuonMaskJ", "GenPart_pdgId == 13 | GenPart_pdgId == -13") ;
+			.Define("MuonMaskJ", "(GenPart_pdgId == 13 | GenPart_pdgId == -13)&&((GenPart_statusFlags & 8192) > 0)") ;
 	
 	auto d_matched = d_def
 				//.Define("MGenJet_eta", "Take(GenJet_eta,MatchedGenJets)")
@@ -462,7 +462,7 @@ void gens(std::string x){
 if __name__=='__main__':
 	
 	# select nano aod, process and save intermmediate filesto disk
-	s = "../nanoaods/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root"
+	s = "../nanoaods/HMM1.root"
 	ROOT.gens(s)
 	print('done')
 	
@@ -479,6 +479,7 @@ if __name__=='__main__':
 	# print((df['nGenMuons'] == 0).any())
 	# in short: this is a better way of keeping track of substructure with multiindex
 	# for jets is the ONLY way as genjet is not accurate (different from our mask?)
+	jets_ev_index = np.unique(df.index.get_level_values(0).values)
 	events_structure_jets = df.reset_index(level=1).index.value_counts().sort_index().values
 	print(events_structure_jets)
 	print(len(events_structure_jets))
@@ -511,8 +512,9 @@ if __name__=='__main__':
 	dfm = dfm.drop(columns=['MGenMuon_charge'])
 	muon_cond.remove('MGenMuon_charge')	
 		
-	dfe = tree.arrays(['event', 'run'], library="pd").astype('float32').dropna()
+	dfe = tree.arrays(['event', 'run'], library="pd").astype(np.longlong).dropna()
 	print(dfe)
+	print(f"Total number of events is {len(dfe)}") 
 	dfe = dfe[~dfe.isin([np.nan, np.inf, -np.inf]).any(1)]
 	events_structure = dfe.values
 	print(events_structure.shape, events_structure.shape)
@@ -525,6 +527,14 @@ if __name__=='__main__':
 	events_structure_el = dfel.reset_index(level=1).index.value_counts().sort_index().values
 	to_ttreel = dfel.values
 	print(events_structure_el.shape, events_structure_el.shape)
+
+	# adjust structure if some events have no jets	
+	zeros = np.zeros(len(dfe), dtype=int)
+	print(len(jets_ev_index), len(events_structure_jets))
+	np.put(zeros, jets_ev_index, events_structure_jets, mode='rise')
+	events_structure_jets = zeros
+	print(events_structure_jets.shape, events_structure_jets)
+	print(sum(events_structure_jets))
 	
 	# adjust structure if some events have no muons	
 	zeros = np.zeros(len(dfe), dtype=int)
@@ -730,5 +740,5 @@ if __name__=='__main__':
 	to_ttreel = ak.Array(to_ttreel)	
 	to_ttreel = ak.unflatten(to_ttreel, events_structure_el)
 
-	with uproot.recreate("synth_nanoaod.root") as file:
+	with uproot.recreate("synth_HMM_nanoaod.root") as file:
 		file["Events"] = {'Jet': to_ttreej, 'Muon': to_ttreem, 'Electron': to_ttreel, 'event': to_ttreee.event, 'run': to_ttreee.run}
