@@ -7,7 +7,7 @@ import sys
 
 if __name__=='__main__':
 	f = sys.argv[1] 
-	tree = uproot.open(f"MMuonsHMM.root:MMuons", num_workers=20)
+	tree = uproot.open(f"MMuonsA{f}.root:MMuons", num_workers=20)
 	vars_to_save = tree.keys()
 	print(vars_to_save)
 
@@ -15,7 +15,8 @@ if __name__=='__main__':
 	df = tree.arrays(library="pd").reset_index(drop=True).astype('float32').dropna()
 	print(df)
 	
-	df = df.drop(["MGenPart_statusFlags2", "MGenPart_statusFlags12", "MGenPart_statusFlags14"], axis=1)
+	# we do not drop any flag
+	# df = df.drop(["MGenPart_statusFlags2", "MGenPart_statusFlags12", "MGenPart_statusFlags14"], axis=1)
 	df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]	
 	# apply saturations 
 	a = df["MMuon_dxyErr"].values 
@@ -88,7 +89,7 @@ if __name__=='__main__':
 	print(df)
 		
 	# open hdf5 file for saving
-	f = h5py.File(f'amuonsHMM.hdf5','w')
+	f = h5py.File(f'amuons{f}.hdf5','w')
 
 	dset = f.create_dataset("data", data=df.values, dtype='f4')
 

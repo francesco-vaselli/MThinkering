@@ -233,7 +233,8 @@ auto second_muon_dphi(ROOT::VecOps::RVec<float> & etaj, ROOT::VecOps::RVec<float
 
 void add_muons(){
 		ROOT::EnableImplicitMT();
-		ROOT::RDataFrame d("Events","../data/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
+		TFile *f =TFile::Open("root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18NanoAODv6/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/250000/047F4368-97D4-1A4E-B896-23C6C72DD2BE.root");
+		ROOT::RDataFrame d("Events",f);
 
 	// create first mask
 	auto d_def = d.Define("JetMask","Jet_genJetIdx >=0  && Jet_genJetIdx < nGenJet").Define("MatchedGenJets","Jet_genJetIdx[JetMask]")
@@ -272,25 +273,25 @@ void add_muons(){
 				.Define("MJet_btagCSVV2", "Jet_btagCSVV2[JetMask]")
 				.Define("MJet_btagDeepB", "Jet_btagDeepB[JetMask]")
 				.Define("MJet_btagDeepC", "Jet_btagDeepC[JetMask]")
-				.Define("MJet_btagDeepCvB", "Jet_btagDeepCvB[JetMask]")
-				.Define("MJet_btagDeepCvL", "Jet_btagDeepCvL[JetMask]")
+				//.Define("MJet_btagDeepCvB", "Jet_btagDeepCvB[JetMask]")
+				//.Define("MJet_btagDeepCvL", "Jet_btagDeepCvL[JetMask]")
 				.Define("MJet_btagDeepFlavB", "Jet_btagDeepFlavB[JetMask]")
 				.Define("MJet_btagDeepFlavC", "Jet_btagDeepFlavC[JetMask]")
-				.Define("MJet_btagDeepFlavCvB", "Jet_btagDeepFlavCvB[JetMask]")
-				.Define("MJet_btagDeepFlavCvL", "Jet_btagDeepFlavCvL[JetMask]")
-				.Define("MJet_btagDeepFlavQG", "Jet_btagDeepFlavQG[JetMask]")			
-				.Define("MJet_cRegCorr", "Jet_cRegCorr[JetMask]")			
-				.Define("MJet_cRegRes", "Jet_cRegRes[JetMask]")			
+				//.Define("MJet_btagDeepFlavCvB", "Jet_btagDeepFlavCvB[JetMask]")
+				//.Define("MJet_btagDeepFlavCvL", "Jet_btagDeepFlavCvL[JetMask]")
+				//.Define("MJet_btagDeepFlavQG", "Jet_btagDeepFlavQG[JetMask]")			
+				//.Define("MJet_cRegCorr", "Jet_cRegCorr[JetMask]")			
+				//.Define("MJet_cRegRes", "Jet_cRegRes[JetMask]")			
 				.Define("MJet_chEmEF", "Jet_chEmEF[JetMask]")			
-				.Define("MJet_chFPV0EF", "Jet_chFPV0EF[JetMask]")			
-				.Define("MJet_chFPV1EF", "Jet_chFPV1EF[JetMask]")			
-				.Define("MJet_chFPV2EF", "Jet_chFPV2EF[JetMask]")			
-				.Define("MJet_chFPV3EF", "Jet_chFPV3EF[JetMask]")			
+				//.Define("MJet_chFPV0EF", "Jet_chFPV0EF[JetMask]")			
+				//.Define("MJet_chFPV1EF", "Jet_chFPV1EF[JetMask]")			
+				//.Define("MJet_chFPV2EF", "Jet_chFPV2EF[JetMask]")			
+				//.Define("MJet_chFPV3EF", "Jet_chFPV3EF[JetMask]")			
 				.Define("MJet_chHEF", "Jet_chHEF[JetMask]")			
 				.Define("MJet_cleanmask", "Jet_cleanmask[JetMask]")			
 				.Define("MJet_etaMinusGen", "Jet_eta[JetMask]-MGenJet_eta")
-				.Define("MJet_hfsigmaEtaEta", "Jet_hfsigmaEtaEta[JetMask]")		
-				.Define("MJet_hfsigmaPhiPhi", "Jet_hfsigmaPhiPhi[JetMask]")			
+				//.Define("MJet_hfsigmaEtaEta", "Jet_hfsigmaEtaEta[JetMask]")		
+				//.Define("MJet_hfsigmaPhiPhi", "Jet_hfsigmaPhiPhi[JetMask]")			
 				.Define("MJet_hadronFlavour", "Jet_hadronFlavour[JetMask]")		
 				.Define("MJet_jetId", "Jet_jetId[JetMask]")
 				.Define("MJet_mass", "Jet_mass[JetMask]")
@@ -307,9 +308,9 @@ void add_muons(){
 				.Define("MJet_phiMinusGen", DeltaPhi,{"MJet_phifiltered", "MGenJet_phi"})
 				.Define("MJet_ptRatio", "Jet_pt[JetMask]/MGenJet_pt")
 				.Define("MJet_puId", "Jet_puId[JetMask]")
-				.Define("MJet_hfadjacentEtaStripsSize", "Jet_hfadjacentEtaStripsSize[JetMask]")
-				.Define("MJet_hfcentralEtaStripSize", "Jet_hfcentralEtaStripSize[JetMask]")
-				.Define("MJet_puIdDisc", "Jet_puIdDisc[JetMask]")
+				//.Define("MJet_hfadjacentEtaStripsSize", "Jet_hfadjacentEtaStripsSize[JetMask]")
+				//.Define("MJet_hfcentralEtaStripSize", "Jet_hfcentralEtaStripSize[JetMask]")
+				//.Define("MJet_puIdDisc", "Jet_puIdDisc[JetMask]")
 				.Define("MJet_qgl", "Jet_qgl[JetMask]")
 				.Define("MJet_rawFactor", "Jet_rawFactor[JetMask]");
 
@@ -319,12 +320,12 @@ void add_muons(){
 	// for (auto &&colName : v2) std::cout <<"\""<< colName<<"\", ";
 	vector<string> col_to_save = 
 		{"MClosestMuon_dr", "MClosestMuon_pt", "MClosestMuon_deta", "MClosestMuon_dphi", "MSecondClosestMuon_dr", "MSecondClosestMuon_pt",
-			"MSecondClosestMuon_deta", "MSecondClosestMuon_dphi", "MGenJet_eta", "MGenJet_mass", "MGenJet_phi", "MGenJet_pt", "MGenJet_partonFlavour", "MGenJet_hadronFlavour", "MJet_area", "MJet_bRegCorr", "MJet_bRegRes",		"MJet_btagCMVA", "MJet_btagCSVV2", "MJet_btagDeepB", "MJet_btagDeepC", "MJet_btagDeepCvB", "MJet_btagDeepCvL","MJet_btagDeepFlavB", "MJet_btagDeepFlavC", "MJet_btagDeepFlavCvB", "MJet_btagDeepFlavCvL", "MJet_btagDeepFlavQG", "MJet_cRegCorr", "MJet_cRegRes", 
-			"MJet_chEmEF", "MJet_chFPV0EF", "MJet_chFPV1EF", "MJet_chFPV2EF", "MJet_chFPV3EF", "MJet_chHEF", "MJet_cleanmask", "MJet_etaMinusGen", "MJet_hfsigmaEtaEta", "MJet_hfsigmaPhiPhi", "MJet_hadronFlavour","MJet_hfadjacentEtaStripsSize","MJet_hfcentralEtaStripSize",
-		 	"MJet_jetId", "MJet_mass", "MJet_muEF", "MJet_muonSubtrFactor", "MJet_nConstituents", "MJet_nElectrons", "MJet_nMuons", "MJet_neEmEF", "MJet_neHEF",
-			"MJet_massRatio", "MJet_partonFlavour", "MJet_phiMinusGen", "MJet_ptRatio", "MJet_puId", "MJet_puIdDisc", "MJet_qgl", "MJet_rawFactor"};
+			"MSecondClosestMuon_deta", "MSecondClosestMuon_dphi", "MGenJet_eta", "MGenJet_mass", "MGenJet_phi", "MGenJet_pt", "MGenJet_partonFlavour", "MGenJet_hadronFlavour","MJet_area", "MJet_btagCMVA", "MJet_btagCSVV2", "MJet_btagDeepB", "MJet_btagDeepC", "MJet_btagDeepFlavB", "MJet_btagDeepFlavC",
+        "MJet_etaMinusGen", "MJet_bRegCorr", "MJet_massRatio", "MJet_nConstituents", "MJet_phiMinusGen", 
+        "MJet_ptRatio","MJet_qgl", "MJet_muEF", "MJet_puId", "MJet_jetId" 
+			};
 
-	d_matched.Snapshot("MJets", "MJets.root", col_to_save);
+	d_matched.Snapshot("MJets", "MJetsA1.root", col_to_save);
 
 }
 

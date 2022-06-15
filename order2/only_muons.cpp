@@ -136,7 +136,7 @@ auto BitwiseDecoder(ROOT::VecOps::RVec<int> &ints, int &bit) {
 	auto size = ints.size();
    	ROOT::VecOps::RVec<float> bits;
 	bits.reserve(size);
-	int num = pow(2, (bit - 1));
+	int num = pow(2, (bit));
 	for (size_t i = 0; i < size; i++) {
 		Double_t bAND = ints[i] & num;
 		if (bAND == num) {
@@ -148,12 +148,26 @@ auto BitwiseDecoder(ROOT::VecOps::RVec<int> &ints, int &bit) {
 	}
 
 
+auto charge(ROOT::VecOps::RVec<int> & pdgId) {
+	auto size = pdgId.size();
+   	ROOT::VecOps::RVec<float> charge;
+	charge.reserve(size);
+	for (size_t i = 0; i < size; i++) {
+		if (pdgId[i] == -13) charge.emplace_back(-1); 
+		else charge.emplace_back(+1);
+	}
+	return charge;
+	}
+
+
+
 void only_muons(){
 		ROOT::EnableImplicitMT();
-		ROOT::RDataFrame d("Events","../data/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
+		TFile *f =TFile::Open("root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18NanoAODv6/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/230000/91456D0B-2FDE-2B4F-8C7A-8E60260480CD.root");
+		ROOT::RDataFrame d("Events",f);
 
 	// create first mask
-	auto d_def = d.Define("MuonMask", "Muon_genPartIdx >=0").Define("MatchedGenMuons", "Muon_genPartIdx[MuonMask]") ;
+	auto d_def = d.Define("MuonMask", "Muon_genPartIdx >=0").Define("MatchedGenMuons", "Muon_genPartIdx[MuonMask]");
 
 	auto colType1 = d_def.GetColumnType("Pileup_gpudensity");
 	// Print column type
@@ -169,7 +183,10 @@ void only_muons(){
 				.Define("MGenMuon_eta", "Take(GenPart_eta,MatchedGenMuons)")
 				.Define("MGenMuon_phi", "Take(GenPart_phi,MatchedGenMuons)")
 				.Define("MGenMuon_pt", "Take(GenPart_pt,MatchedGenMuons)")
+				.Define("MGenMuon_pdgId", "Take(GenPart_pdgId, MatchedGenMuons)")
+				.Define("MGenMuon_charge", charge, {"MGenMuon_pdgId"})
 				.Define("MGenPart_statusFlags","Take(GenPart_statusFlags,MatchedGenMuons)")
+				.Define("MGenPart_statusFlags0", [](ROOT::VecOps::RVec<int> &ints){ int bit = 0; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
 				.Define("MGenPart_statusFlags1", [](ROOT::VecOps::RVec<int> &ints){ int bit = 1; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
 				.Define("MGenPart_statusFlags2", [](ROOT::VecOps::RVec<int> &ints){ int bit = 2; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
 				.Define("MGenPart_statusFlags3", [](ROOT::VecOps::RVec<int> &ints){ int bit = 3; return BitwiseDecoder(ints, bit); }, {"MGenPart_statusFlags"})
@@ -195,7 +212,6 @@ void only_muons(){
 				.Define("MMuon_ptRatio", "Muon_pt[MuonMask]/MGenMuon_pt")
 				.Define("MMuon_dxy", "Muon_dxy[MuonMask]")
 				.Define("MMuon_dxyErr", "Muon_dxyErr[MuonMask]")
-				.Define("MMuon_dxybs", "Muon_dxybs[MuonMask]")
 				.Define("MMuon_dz", "Muon_dz[MuonMask]")
 				.Define("MMuon_dzErr", "Muon_dzErr[MuonMask]")
 				.Define("MMuon_ip3d", "Muon_ip3d[MuonMask]")
@@ -222,15 +238,9 @@ void only_muons(){
 	auto v2 = d_matched.GetColumnNames();
 	// for (auto &&colName : v2) std::cout <<"\""<< colName<<"\", ";
 	vector<string> col_to_save = 
-		{"MGenMuon_eta", "MGenMuon_phi", "MGenMuon_pt", "MGenPart_statusFlags1", "MGenPart_statusFlags2", "MGenPart_statusFlags3", "MGenPart_statusFlags4",
-			"MGenPart_statusFlags5", "MGenPart_statusFlags6", "MGenPart_statusFlags7", "MGenPart_statusFlags8", "MGenPart_statusFlags9", "MGenPart_statusFlags10", "MGenPart_statusFlags11",
-			"MGenPart_statusFlags12", "MGenPart_statusFlags13", "MGenPart_statusFlags14", "MClosestJet_dr", "MClosestJet_deta", "MClosestJet_dphi", "MClosestJet_pt", "MClosestJet_mass",
-			"Pileup_gpudensity", "Pileup_nPU", "Pileup_nTrueInt", "Pileup_pudensity", "Pileup_sumEOOT", "Pileup_sumLOOT",
-			"MMuon_etaMinusGen", "MMuon_phiMinusGen", "MMuon_ptRatio", "MMuon_dxy", "MMuon_dxyErr", "MMuon_dxybs", "MMuon_dz", "MMuon_dzErr", "MMuon_ip3d", "MMuon_isGlobal", "MMuon_isPFcand",
-			"MMuon_isTracker", "MMuon_jetPtRelv2","MMuon_jetRelIso", "MMuon_mediumId", "MMuon_pfRelIso03_all", "MMuon_pfRelIso03_chg", "MMuon_pfRelIso04_all", "MMuon_ptErr",
-			"MMuon_sip3d", "MMuon_softId", "MMuon_softMva", "MMuon_softMvaId"};
+		{"MGenMuon_eta" , "MGenMuon_phi", "MGenMuon_pt", "MGenMuon_charge","MGenPart_statusFlags0", "MGenPart_statusFlags1", "MGenPart_statusFlags2", "MGenPart_statusFlags3", "MGenPart_statusFlags4",	"MGenPart_statusFlags5", "MGenPart_statusFlags6", "MGenPart_statusFlags7", "MGenPart_statusFlags8", "MGenPart_statusFlags9", "MGenPart_statusFlags10", "MGenPart_statusFlags11",	"MGenPart_statusFlags12", "MGenPart_statusFlags13", "MGenPart_statusFlags14", "MClosestJet_dr", "MClosestJet_deta", "MClosestJet_dphi", "MClosestJet_pt", "MClosestJet_mass",	"Pileup_gpudensity", "Pileup_nPU", "Pileup_nTrueInt", "Pileup_pudensity", "Pileup_sumEOOT", "Pileup_sumLOOT","MMuon_etaMinusGen", "MMuon_phiMinusGen", "MMuon_ptRatio", "MMuon_dxy", "MMuon_dxyErr", "MMuon_dz", "MMuon_dzErr", "MMuon_ip3d", "MMuon_isGlobal", "MMuon_isPFcand",	"MMuon_isTracker", "MMuon_jetPtRelv2","MMuon_jetRelIso", "MMuon_mediumId", "MMuon_pfRelIso03_all", "MMuon_pfRelIso03_chg", "MMuon_pfRelIso04_all", "MMuon_ptErr",	"MMuon_sip3d", "MMuon_softId", "MMuon_softMva", "MMuon_softMvaId"};
 
-	d_matched.Snapshot("MMuons", "MMuons.root", col_to_save);
+	d_matched.Snapshot("MMuons", "MMuonsA9.root", col_to_save);
 
 }
 
