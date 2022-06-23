@@ -30,3 +30,5 @@ Signal comparison
 dataset link https://cmsweb.cern.ch/das/request?instance=prod/phys03&input=file+dataset%3D%2FVBFHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8%2Farizzi-RunIISummer16MiniAODv3_FSRnano18MC_NANOV10b_018_realistic_v15-v1-d92a4324cf7915102060a1e7868b1f8f%2FUSER
 
 1 /store/user/arizzi/FSRnano18MC_NANOV10b/VBFHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8/RunIISummer16MiniAODv3_FSRnano18MC_NANOV10b_018_realistic_v15-v1/200408_224615/0000/nano18MC_NANO_1.root
+
+and also this signal dataset: /VBFHToMuMu_M125_TuneCP5_PSweights_13TeV_amcatnlo_pythia8/arizzi-RunIISummer16MiniAODv3_FSRnano18MC_NANOV10b_018_realistic_v15-v2-d92a4324cf7915102060a1e7868b1f8f/USER
