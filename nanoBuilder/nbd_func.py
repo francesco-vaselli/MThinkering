@@ -398,7 +398,7 @@ auto charge(ROOT::VecOps::RVec<int> & pdgId) {
 	}
 
 void gens(std::string x){
-	//	ROOT::EnableImplicitMT();
+		ROOT::EnableImplicitMT();
 		ROOT::RDataFrame d("Events", x);
 	// create first mask
 	auto d_def = d.Define("MuonMask", "Muon_genPartIdx >=0").Define("MatchedGenMuons", "Muon_genPartIdx[MuonMask]")
@@ -462,7 +462,7 @@ void gens(std::string x){
 			"Pileup_sumLOOT", "event", "run", "Electron_eta", "Electron_pt", "Electron_mvaFall17V2Iso_WP90"};	
 	
 	//d_matched.Snapshot("GensJ", "testGensJ.root", col_to_save);
-	# as of now this will get saved and overwritten in the execution folder
+	// as of now this will get saved and overwritten in the execution folder
 	d_matched.Snapshot("Gens", "testGens.root", col_to_save);
 }
 ''')
@@ -616,11 +616,11 @@ def nbd(jet_model, muon_model, root, file_path, new_root):
 	totalj[:, 11] = totalj[:, 11] +  df['GenJet_phi'].values
 	totalj[:, 11]= np.where( totalj[:, 11]< -np.pi, totalj[:, 11] + 2*np.pi, totalj[:, 11])
 	totalj[:, 11]= np.where( totalj[:, 11]> np.pi, totalj[:, 11] - 2*np.pi, totalj[:, 11])
-	totalj[:, 12] = totalj[:, 12] * df['GenJet_pt'].valuesi
+	totalj[:, 12] = totalj[:, 12] * df['GenJet_pt'].values
 
 	# transform back dequantized flags
-	totalj[:, 15]= np.where( totalj[:, 15]> 0.5, 1, 0)
-	totalj[:, 16]= np.where( totalj[:, 16]> 0.5, 1, 0)
+	totalj[:, 15]= np.rint(totalj[:, 15])
+	totalj[:, 16]= np.rint(totalj[:, 16])
 
 	print(totalj.shape)
 	
@@ -764,6 +764,7 @@ def nbd(jet_model, muon_model, root, file_path, new_root):
 	to_ttreel = ak.unflatten(to_ttreel, events_structure_el)
 
 	new_path = str(os.path.join(new_root, file_path))
+	new_path = os.path.splitext(new_path)[0]
 	with uproot.recreate(f"{new_path}_synth.root") as file:
 		file["Events"] = {'Jet': to_ttreej, 'Muon': to_ttreem, 'Electron': to_ttreel, 'event': to_ttreee.event, 'run': to_ttreee.run}
 
